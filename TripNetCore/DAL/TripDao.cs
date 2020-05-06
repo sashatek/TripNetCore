@@ -21,21 +21,24 @@ namespace TripNetCore.DAL
             var tripModels = _db.Trip
                 .Include(t => t.Airport)
                 .Include(t => t.TransType)
-                .Select(t => new TripModel
+                .Select(e => new TripModel
                 {
-                    tripId = t.TripId,
-                    tripDate = t.TripDate,
-                    airport = new LookupItem
+                    tripId = e.TripId,
+                    tripDate = e.TripDate,
+                    airportId = e.AirportId,
+                    airportInfo = new LookupItem()
                     {
-                        id = t.Airport.AirportId,
-                        text = t.Airport.IataIdent,
-                        text2 = t.Airport.Name
+                        id = e.AirportId,
+                        text = e.Airport.IataIdent,
+                        text2 = e.Airport.Name
                     },
-                    transTypeId = t.TransTypeId,
-                    transTypeDesc = t.TransType.Description,
-                    groupSize = t.GroupSize,
-                    groupName = t.GroupName,
-                    isActive = t.Active
+                    transTypeId = e.TransTypeId,
+                    transTypeDesc = e.TransType.Description,
+                    groupName = e.GroupName,
+                    groupSize = e.GroupSize,
+                    active = e.Active,
+                    note = e.Note
+
                 });
             return tripModels.ToArray();
         }
@@ -45,23 +48,25 @@ namespace TripNetCore.DAL
             var tripModel = _db.Trip
                 .Include(t => t.Airport)
                 .Include(t => t.TransType)
-                .Where(t=>t.TripId == tripId)
-                .Select(t => new TripModel
+                .Where(t => t.TripId == tripId)
+                .Select(e => new TripModel
                 {
-                    tripId = t.TripId,
-                    tripDate = t.TripDate,
-                    airport = new LookupItem
+                    tripId = e.TripId,
+                    tripDate = e.TripDate,
+                    airportId = e.AirportId,
+                    airportInfo = new LookupItem()
                     {
-                        id = t.Airport.AirportId,
-                        text = t.Airport.IataIdent,
-                        text2 = t.Airport.Name
+                        id = e.AirportId,
+                        text = e.Airport.IataIdent,
+                        text2 = e.Airport.Name
                     },
-                    transTypeId = t.TransTypeId,
-                    transTypeDesc = t.TransType.Description,
-                    groupSize = t.GroupSize,
-                    groupName = t.GroupName,
-                    isActive = t.Active,
-                    note = t.Note
+                    transTypeId = e.TransTypeId,
+                    transTypeDesc = "",  // Add your text/desc field name like e.TransType.Description
+                    groupName = e.GroupName,
+                    groupSize = e.GroupSize,
+                    active = e.Active,
+                    note = e.Note
+
                 })
                 .SingleOrDefault();
             return tripModel;
@@ -82,7 +87,7 @@ namespace TripNetCore.DAL
             _db.Entry(trip).State = EntityState.Modified;
             return _db.SaveChanges();
         }
- 
+
 
         public async Task<TripModel> addTripAsync(TripModel model)
         {
@@ -91,7 +96,7 @@ namespace TripNetCore.DAL
             _db.Trip.Add(trip);
             await _db.SaveChangesAsync();
             model.tripId = trip.TripId;
-            return model ;
+            return model;
         }
 
         public int deleteTrip(int id)
@@ -106,22 +111,23 @@ namespace TripNetCore.DAL
             _db.SaveChanges();
             return 0;
         }
- 
+
         public void updateFromModel(Trip trip, TripModel model)
         {
             if (trip != null)
             {
                 trip.TripId = model.tripId;
                 trip.TripDate = model.tripDate;
-                trip.AirportId = model.airport != null ? model.airport.id : 0;
+                trip.AirportId = model.airportId;
+                trip.AirportId = model.airportInfo.id; // Select one
                 trip.TransTypeId = model.transTypeId;
-                trip.GroupSize = model.groupSize;
                 trip.GroupName = model.groupName;
-                trip.Active = model.isActive;
+                trip.GroupSize = model.groupSize;
+                trip.Active = model.active;
                 trip.Note = model.note;
+
             }
         }
-
-
     }
+
 }

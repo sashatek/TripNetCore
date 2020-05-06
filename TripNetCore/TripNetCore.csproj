@@ -2,11 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="DAL\DbModels\" />
-    <Folder Include="DAL\" />
     <Folder Include="Utils\" />
     <Folder Include="NewFolder\" />
   </ItemGroup>

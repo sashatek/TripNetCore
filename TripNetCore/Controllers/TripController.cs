@@ -14,7 +14,7 @@ namespace TripCore.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[EnableCors("CorsPolicy")]
+    [EnableCors("CorsPolicy")]
     public class TripController : ControllerBase
     {
         private readonly DevCodeContext _db;
@@ -47,7 +47,7 @@ namespace TripCore.Controllers
             {
                 var dao = new TripDao(_db);
                 model = dao.getTrip(id);
-             }
+            }
             catch (Exception e)
             {
                 return BadRequest(new { message = ErrorUtils.dbErrorMessage($"Can't get Trip with id={id}", e) });
@@ -112,7 +112,7 @@ namespace TripCore.Controllers
             }
             catch (Exception e)
             {
-              return BadRequest(new { message = ErrorUtils.dbErrorMessage($"Can't insert (add) Trip", e) });
+                return BadRequest(new { message = ErrorUtils.dbErrorMessage($"Can't insert (add) Trip", e) });
             }
 
             return CreatedAtAction("GetTrip", new { id = tripModel.tripId }, tripModel);

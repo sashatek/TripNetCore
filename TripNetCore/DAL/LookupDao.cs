@@ -17,7 +17,7 @@ namespace TripNetCore.DAL
 
         public LookupItem[] airportsByIata(string term)
         {
-            var q = _db.Airport
+            return _db.Airport
                  .Where(c => c.IataIdent.StartsWith(term))
                  .OrderBy(c => c.IataIdent)
                  .Take(15)
@@ -28,9 +28,6 @@ namespace TripNetCore.DAL
                      text2 = c.Name.Trim()
                  })
                  .ToArray();
-
-
-            return q;
         }
     }
 }
