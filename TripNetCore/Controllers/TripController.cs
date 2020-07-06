@@ -26,11 +26,11 @@ namespace TripCore.Controllers
         // GET: api/TripApi
         [HttpGet]
         [Route("GetAll")]
-        public IEnumerable<TripModel> GetAll()
+        public async Task<IActionResult> GetAll()
         {
             var dao = new TripDao(_db);
-            var models = dao.getTrips();
-            return models;
+            var models = await dao.getTripsAsync();
+            return Ok(models);
         }
 
         // GET: api/TripApi/5
@@ -42,11 +42,11 @@ namespace TripCore.Controllers
                 return BadRequest(ModelState);
             }
 
-            TripModel model = null;
+            TripModel model;
             try
             {
                 var dao = new TripDao(_db);
-                model = dao.getTrip(id);
+                model = await  dao.getTripAsync(id);
             }
             catch (Exception e)
             {
@@ -81,7 +81,7 @@ namespace TripCore.Controllers
             try
             {
                 var dao = new TripDao(_db);
-                dao.saveTrip(tripModel);
+                tripModel = await dao.saveTripAsync(tripModel);
             }
             catch (Exception e)
             {
@@ -92,7 +92,7 @@ namespace TripCore.Controllers
                 return BadRequest(new { message = ErrorUtils.dbErrorMessage($"Can't save Trip with id={id}", e) });
             }
 
-            return NoContent();
+            return NoContent(); // Or Ok(tripModel);
         }
 
         // POST: api/TripApi
@@ -108,7 +108,7 @@ namespace TripCore.Controllers
             {
                 var dao = new TripDao(_db);
                 //tripModel.transTypeId = 100;
-                tripModel = dao.addTrip(tripModel);
+                tripModel = await dao.addTripAsync(tripModel);
             }
             catch (Exception e)
             {
@@ -125,7 +125,7 @@ namespace TripCore.Controllers
             try
             {
                 var dao = new TripDao(_db);
-                if (dao.deleteTrip(id) == -1)
+                if (await dao.deleteTripAsync(id) == -1)
                 {
                     return NotFound();
                 }

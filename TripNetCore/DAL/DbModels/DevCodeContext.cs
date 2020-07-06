@@ -18,6 +18,7 @@ namespace TripNetCore.DAL.DbModels
         public virtual DbSet<Airport> Airport { get; set; }
         public virtual DbSet<TransType> TransType { get; set; }
         public virtual DbSet<Trip> Trip { get; set; }
+        public virtual DbSet<VwTrip> VwTrip { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -33,6 +34,11 @@ namespace TripNetCore.DAL.DbModels
             modelBuilder.Entity<Airport>(entity =>
             {
                 entity.Property(e => e.AirportId).ValueGeneratedNever();
+
+                entity.Property(e => e.AirportName)
+                    .IsRequired()
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.IataIdent)
                     .IsRequired()
@@ -57,11 +63,6 @@ namespace TripNetCore.DAL.DbModels
                 entity.Property(e => e.Lon)
                     .IsRequired()
                     .HasMaxLength(11)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Name)
-                    .IsRequired()
-                    .HasMaxLength(30)
                     .IsUnicode(false);
             });
 
@@ -99,6 +100,39 @@ namespace TripNetCore.DAL.DbModels
                     .HasForeignKey(d => d.TransTypeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Trip_TransType");
+            });
+
+            modelBuilder.Entity<VwTrip>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToView("vwTrip");
+
+                entity.Property(e => e.AirportName)
+                    .IsRequired()
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Description)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.GroupName)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.IataIdent)
+                    .IsRequired()
+                    .HasMaxLength(3)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Note)
+                    .HasMaxLength(256)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.TripDate).HasColumnType("datetime");
             });
 
             OnModelCreatingPartial(modelBuilder);

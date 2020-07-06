@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,24 +10,24 @@ namespace TripCore.DAL
 {
     public class ReferenceDataDao
     {
-        DevCodeContext _db;
+        readonly DevCodeContext _db;
         public ReferenceDataDao(DevCodeContext db)
         {
             _db = db;
         }
 
 
-        public ReferenceData getAll()
+        public async Task<ReferenceData> getAllAsync()
         {
             var model = new ReferenceData();
 
-            model.transTypes = (from d in _db.TransType
+            model.transTypes = await (from d in _db.TransType
                                     //orderby d.IsActive, d.LocationDesc
                                 select new LookupItem()
                                 {
                                     id = d.TransTypeId,
                                     text = d.Description
-                                }).ToArray();
+                                }).ToArrayAsync();
 
             // From enum
             //

@@ -28,17 +28,17 @@ namespace TripCore.Controllers
         [Route("GetAll")]
         public async Task<IActionResult> GetAll()
         {
-            ReferenceData referenceData = null;
+            ReferenceData referenceData;
             try
             {
                 var dao = new ReferenceDataDao(_db);
-                referenceData = dao.getAll();
-                return Ok(referenceData);
+                referenceData = await dao.getAllAsync();
             }
             catch (Exception e)
             {
                 return BadRequest(new { message = ErrorUtils.dbErrorMessage("Can't get reference dataset", e)});
             }
+            return Ok(referenceData);
         }
     }
 }

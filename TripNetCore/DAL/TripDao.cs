@@ -10,13 +10,13 @@ namespace TripNetCore.DAL
 {
     public class TripDao
     {
-        DevCodeContext _db;
+        readonly DevCodeContext _db;
         public TripDao(DevCodeContext db)
         {
             _db = db;
         }
 
-        public TripModel[] getTrips()
+        public async Task<TripModel[]> getTripsAsync()
         {
             var tripModels = _db.Trip
                 .Include(t => t.Airport)
@@ -30,7 +30,7 @@ namespace TripNetCore.DAL
                     {
                         id = e.AirportId,
                         text = e.Airport.IataIdent,
-                        text2 = e.Airport.Name
+                        text2 = e.Airport.AirportName
                     },
                     transTypeId = e.TransTypeId,
                     transTypeDesc = e.TransType.Description,
@@ -40,10 +40,10 @@ namespace TripNetCore.DAL
                     note = e.Note
 
                 });
-            return tripModels.ToArray();
+            return await tripModels.ToArrayAsync();
         }
 
-        public TripModel getTrip(int tripId)
+        public async Task<TripModel> getTripAsync(int tripId)
         {
             var tripModel = _db.Trip
                 .Include(t => t.Airport)
@@ -58,7 +58,7 @@ namespace TripNetCore.DAL
                     {
                         id = e.AirportId,
                         text = e.Airport.IataIdent,
-                        text2 = e.Airport.Name
+                        text2 = e.Airport.AirportName
                     },
                     transTypeId = e.TransTypeId,
                     transTypeDesc = "",  // Add your text/desc field name like e.TransType.Description
@@ -68,27 +68,10 @@ namespace TripNetCore.DAL
                     note = e.Note
 
                 })
-                .SingleOrDefault();
-            return tripModel;
-        }
-        public TripModel addTrip(TripModel model)
-        {
-            var trip = new Trip();
-            updateFromModel(trip, model);
-            _db.Trip.Add(trip);
-            _db.SaveChanges();
-            model.tripId = trip.TripId;
-            return model;
-        }
-        public int saveTrip(TripModel model)
-        {
-            var trip = _db.Trip.Find(model.tripId);
-            updateFromModel(trip, model);
-            _db.Entry(trip).State = EntityState.Modified;
-            return _db.SaveChanges();
-        }
+                .SingleOrDefaultAsync();
 
-
+            return await tripModel;
+        }
         public async Task<TripModel> addTripAsync(TripModel model)
         {
             var trip = new Trip();
@@ -98,8 +81,16 @@ namespace TripNetCore.DAL
             model.tripId = trip.TripId;
             return model;
         }
+        public async Task<TripModel> saveTripAsync(TripModel model)
+        {
+            var trip = _db.Trip.Find(model.tripId);
+            updateFromModel(trip, model);
+            _db.Entry(trip).State = EntityState.Modified;
+            await _db.SaveChangesAsync();
+            return model;
+        }
 
-        public int deleteTrip(int id)
+        public async Task<int> deleteTripAsync(int id)
         {
             var trip = _db.Trip.Find(id);
             if (trip == null)
@@ -108,7 +99,7 @@ namespace TripNetCore.DAL
             }
 
             _db.Trip.Remove(trip);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
             return 0;
         }
 

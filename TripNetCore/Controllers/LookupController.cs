@@ -26,10 +26,10 @@ namespace TripCore.Controllers
         //[HttpGet]
         // [EnableCors("MyPolicy")]
         [Route("Iata/{term}")]
-        public LookupItem[] Iata(string term)
+        public async Task<LookupItem[]> Iata(string term)
         {
             var lookupDao = new LookupDao(_db);
-            return lookupDao.airportsByIata(term);
+            return await lookupDao.airportsByIataAsync(term);
         }
     }
 }
